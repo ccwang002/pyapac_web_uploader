@@ -37,7 +37,7 @@ class SiteConnector:
         self.lang = lang
         self.login_url = self.url('accounts/login')
         self.logout_url = self.url('accounts/logout')
-        self.edit_url = self.url('edit')
+        self.edit_url = self.url('edit/')
 
     def login(self, keychain_pth='.web_keychain'):
         try:
