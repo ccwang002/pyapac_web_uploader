@@ -1,7 +1,7 @@
 from pathlib import Path
 import re
-import urllib
 import sys
+# import urllib
 
 from bs4 import BeautifulSoup
 import click
@@ -16,6 +16,18 @@ Edit file {:s} with following format:
     Account: 'YOUR ACCOUNT'
     Password: 'PASSWORD'
 '''
+
+class ConnectionError(Exception):
+    def __init__(self, msg, resp, *args, **kwargs):
+        self.msg = msg
+        self.resp = resp
+        super().__init__(*args, **kwargs)
+
+    def __repr__(self):
+        return (
+            'ConnectionError: {0.msg} with {0.resp.status_code}'
+            .format(self)
+        )
 
 class SiteConnector:
     def __init__(self, url_base, lang):
@@ -45,7 +57,7 @@ class SiteConnector:
             headers={'Referer': self.login_url}
         )
         if r.status_code != 200:
-            raise urllib.error.HTTPError(reason='Login fail')
+            raise ConnectionError('Login fail', r)
         return r
 
     def logout(self):
@@ -70,9 +82,7 @@ class SiteConnector:
             headers={'Referer': page_url}
         )
         if r.status_code != 200:
-            raise urllib.error.HTTPError(
-                reason='Update {} fail'.format(page_url)
-            )
+            raise ConnectionError('Update {} fail'.format(page_url), r)
         return r
 
     def url(self, url):
