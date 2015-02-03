@@ -1,0 +1,30 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+
+# Python
+.ipynb_checkpoints/
+__pycache__/
+*.py[cod]
+
+
+# Distribution / packaging
+build/
+dist/
+eggs/
+sdist/
+*.egg-info/
+*.egg
+
+
+# Unit test / coverage report
+.coverage
+.tox
+nosetests.xml
