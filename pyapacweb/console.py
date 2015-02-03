@@ -147,7 +147,7 @@ def upload(html, keychain):
     Note that /<lang>/page must exist.
     """
     click.echo('Uploading {:s} ...'.format(html))
-    html_pth = Path(html)
+    html_pth = Path(html).resolve()
     *_, lang_suffix, __ = html_pth.parts
     page_name = html_pth.stem
     click.echo(
