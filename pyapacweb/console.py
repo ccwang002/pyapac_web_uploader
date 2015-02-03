@@ -131,20 +131,21 @@ def cli():
 
 
 @cli.command(short_help='Upload html to web')
-@click.argument('html', type=_existed_file_type())
+@click.argument('html', type=_existed_file_type(), metavar='<html_pth>')
 @click.option(
-    '--keychain',
-    help='Path to .web_keychain for login',
+    '--keychain', 'keychain_pth',
+    help='Path to .web_keychain for login [default: .web_keychain]',
     default='.web_keychain',
     type=_existed_file_type(),
 )
-def upload(html, keychain):
-    """Upload a html to web content respecting lang
+def upload(html, keychain_pth):
+    """Upload html files to web content respecting lang
 
-    For /path/to/<lang>/page.html, overwrites web content
-    at https://tw.pycon.org/2015apac/<lang>/page
+    For <html_pth>=/path/to/<lang>/page.html,
+    pyapac-web overwrites web content at
+    https://tw.pycon.org/2015apac/<lang>/page
 
-    Note that /<lang>/page must exist.
+    Note that on web /<lang>/page must exist.
     """
     click.echo('Uploading {:s} ...'.format(html))
     html_pth = Path(html).resolve()
@@ -159,7 +160,7 @@ def upload(html, keychain):
         url_base='https://tw.pycon.org/2015apac',
         lang=lang_suffix
     )
-    site.login(keychain)
+    site.login(keychain_pth)
     site.upload(page_name, html_pth)
     site.logout()
 
