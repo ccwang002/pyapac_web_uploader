@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 import urllib
+import sys
 
 from bs4 import BeautifulSoup
 import click
@@ -10,7 +11,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 _LOGIN_ERR_MSG = '''\
 Something wrong with reading login info.
-Edit file .web_keychain with following format:
+Edit file {:s} with following format:
 
     Account: 'YOUR ACCOUNT'
     Password: 'PASSWORD'
@@ -25,12 +26,12 @@ class SiteConnector:
         self.logout_url = self.url('accounts/logout')
         self.edit_url = self.url('edit')
 
-    def login(self, keychain_pth='../.web_keychain'):
+    def login(self, keychain_pth='.web_keychain'):
         try:
             ACCOUNT, PASSWORD = self._read_keychain(keychain_pth)
-        except Exception as e:
-            print(_LOGIN_ERR_MSG)
-            raise e
+        except Exception:
+            print(_LOGIN_ERR_MSG.format(keychain_pth))
+            sys.exit(1)
         # standard Django login with CSRF protection
         r = self._session.get(self.login_url)
         login_payload = {
