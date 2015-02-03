@@ -75,7 +75,7 @@ class SiteConnector:
         soup = BeautifulSoup(r.content)
         content_form = soup.select('form.editable-form')[0]
         upload_payload = self._gen_form_payload(content_form)
-        upload_payload['content'] = html.replace('\n', '')
+        upload_payload['content'] = html
 
         # mimic the frontend editing POST
         r = self._session.post(
