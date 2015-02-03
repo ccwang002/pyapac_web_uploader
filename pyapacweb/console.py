@@ -64,12 +64,13 @@ class SiteConnector:
     def logout(self):
         return self._session.get(self.logout_url)
 
-    def upload(self, page_url, page_html_pth):
-        """Upload page_html_pth to url_base/lang/page_url"""
-        with open(page_html_pth) as f:
+    def upload(self, page_name, page_html_pth):
+        """Upload page_html_pth to url_base/lang/page_name"""
+        with Path(page_html_pth).open() as f:
             html = f.read().replace('\n', '')
 
         # get page_url's session and page id
+        page_url = self.url(page_name)
         r = self._session.get(page_url)
         soup = BeautifulSoup(r.content)
         content_form = soup.select('form.editable-form')[0]
