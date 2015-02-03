@@ -1,3 +1,4 @@
+import functools
 from pathlib import Path
 import re
 import sys
@@ -113,6 +114,15 @@ class SiteConnector:
         return ACCOUNT, PASSWORD
 
 
+_existed_file_type = functools.partial(
+    click.Path,
+    exists=True,
+    file_okay=True,
+    dir_okay=False,
+    readable=True
+)
+
+
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
     """PyCon APAC 2015 web content uploader"""
@@ -120,14 +130,12 @@ def cli():
 
 
 @cli.command(short_help='Upload html to web')
-@click.argument(
-    'html',
-    type=click.Path(file_okay=True, dir_okay=False, readable=True)
-)
+@click.argument('html', type=_existed_file_type())
 @click.option(
     '--keychain',
     help='Path to .web_keychain for login',
-    type=click.Path(file_okay=True, dir_okay=False, readable=True),
+    default='.web_keychain',
+    type=_existed_file_type(),
 )
 def upload(html, keychain):
     """Upload a html to web content respecting lang
