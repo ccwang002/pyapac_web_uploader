@@ -62,7 +62,7 @@ class SiteConnector:
         return r
 
     def logout(self):
-        self._session.get(self.logout_url)
+        return self._session.get(self.logout_url)
 
     def upload(self, page_url, page_html_pth):
         """Upload page_html_pth to url_base/lang/page_url"""
