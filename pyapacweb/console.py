@@ -196,7 +196,13 @@ def parse_page_param(ctx, param, value):
     show_default=True,
     type=_existed_file_type(),
 )
-def upload(html, keychain_pth):
+@click.option(
+    '--target', 'page',
+    help='Full or partial url to the page',
+    metavar='<page_url>',
+    callback=parse_page_param
+)
+def upload(html, keychain_pth, lang=None, page=None):
     """Upload html files to web content respecting lang
 
     For <html_pth>=/path/to/<lang>/page.html,
@@ -206,9 +212,19 @@ def upload(html, keychain_pth):
     Note that on web /<lang>/page must exist.
     """
     click.echo('Uploading {:s} ...'.format(html))
-    html_pth = Path(html).resolve()
-    *_, lang_suffix, __ = html_pth.parts
-    page_name = html_pth.stem
+    if lang and page:
+        lang_suffix = lang
+        page_name = page
+    else:
+        html_pth = Path(html).resolve()
+        *_, lang_suffix, __ = html_pth.parts
+        if not lang_suffix or lang_suffix not in LANG_CHOICES:
+            raise click.BadParameter(
+                'Unknown lang suffix: {:s} of path {!s}'
+                .format(lang_suffix, html_pth),
+                param_hint='<html_pth>',
+            )
+        page_name = html_pth.stem
     click.echo(
         'Lang: {:s} | Page: {:s}'
         .format(lang_suffix, page_name)
