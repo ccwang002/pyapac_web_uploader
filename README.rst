@@ -56,7 +56,9 @@ Sometimes people change directly on site,
 you may want to update that change into repo.
 This can be done by::
 
-    pyapac-web download <lang>/<page>
+    pyapac-web download https://.../2015apac/en/venue
+    pyapac-web download en/venue
+    pyapac-web download en/venue /path/to/out.html
 
 By default, you could get a prettified HTML at ``./<lang>_<page>.html``.
 Note that uploaded HTML don't remember original indent space,
