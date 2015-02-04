@@ -155,7 +155,13 @@ _existed_file_type = functools.partial(
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 def cli():
-    """PyCon APAC 2015 web content uploader"""
+    """PyCon APAC 2015 web content uploader.
+
+    Check each command's usage by
+
+    \b
+        pyapac-web <subcmd> -h
+    """
     pass
 
 
