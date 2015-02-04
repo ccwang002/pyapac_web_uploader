@@ -93,11 +93,19 @@ class SiteConnector:
 
     def _gen_form_payload(self, form_soup):
         """Generate editing payload from given editing page"""
-        # TODO: stop user if model isn't richtext
-        return {
+        payload = {
             k: form_soup.find('input', attrs={'name': k}).attrs['value']
             for k in ['app', 'model', 'id', 'fields', 'csrfmiddlewaretoken']
         }
+        is_valid_form = (
+            payload['app'] == 'pages' and payload['model'] == 'richtextpage'
+        )
+        if not is_valid_form:
+            raise ValueError(
+                'Editing a invalid page of id={id}, app={app}, model={model}'
+                .format(**payload)
+            )
+        return payload
 
     def _read_keychain(self, keychain_pth):
         _field_regex = (
