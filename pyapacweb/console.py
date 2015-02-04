@@ -64,9 +64,9 @@ class SiteConnector:
     def logout(self):
         return self._session.get(self.logout_url)
 
-    def upload(self, page_name, page_html_pth):
-        """Upload page_html_pth to url_base/lang/page_name"""
-        with Path(page_html_pth).open() as f:
+    def upload(self, page_name, src_pth):
+        """Upload src_pth to self.url_base/self.lang/page_name"""
+        with Path(src_pth).open() as f:
             html = f.read().replace('\n', '')
 
         # get page_url's session and page id
