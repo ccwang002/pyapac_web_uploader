@@ -205,11 +205,13 @@ def parse_page_param(ctx, param, value):
 def upload(html, keychain_pth, lang=None, page=None):
     """Upload html files to web content respecting lang
 
-    For <html_pth>=/path/to/<lang>/page.html,
-    pyapac-web overwrites web content at
-    https://tw.pycon.org/2015apac/<lang>/page
+    To upload path/to/<lang>/<page>.html to /<lang>/<page>,
 
-    Note that on web /<lang>/page must exist.
+    \b
+        pyapac-web upload path/to/<lang>/<page>.html
+        pyapac-web upload src.html --target <lang>/<page>
+
+    Note that on web /<lang>/<page> must exist.
     """
     click.echo('Uploading {:s} ...'.format(html))
     if lang and page:
@@ -230,6 +232,7 @@ def upload(html, keychain_pth, lang=None, page=None):
         .format(lang_suffix, page_name)
     )
 
+    # main logics
     site = SiteConnector(
         url_base='https://tw.pycon.org/2015apac',
         lang=lang_suffix
