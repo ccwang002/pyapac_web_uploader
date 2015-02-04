@@ -87,6 +87,26 @@ class SiteConnector:
             raise ConnectionError('Update {} fail'.format(page_url), r)
         return r
 
+    def download(self, page_name, dst_pth):
+        """Download self.url_base/self.lang/page_name to dst_pth"""
+        page_url = self.url(page_name)
+        r = self._session.get(page_url)
+        if r.status_code != 200:
+            raise ConnectionError('Download {} fail'.format(page_url), r)
+
+        # extract the form value for raw input
+        soup = BeautifulSoup(r.content)
+        page_raw_html = soup.select(
+            'form.editable-form textarea.mceEditor.charfield'
+        )[0].text
+
+        # re-parse the raw input as a valid html structure
+        page_content_soup = BeautifulSoup(page_raw_html, 'html.parser')
+        page_normalized_html = page_content_soup.prettify()
+        with Path(dst_pth).open('w') as f:
+            print(page_normalized_html, file=f)
+        return r
+
     def url(self, url):
         """Return full URL self.url_base / self.lang / <url>"""
         return '/'.join([self.url_base, self.lang, url])
