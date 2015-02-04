@@ -9,6 +9,7 @@ import click
 import requests
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+LANG_CHOICES = ['en', 'zh', 'ja', 'kr']
 
 _LOGIN_ERR_MSG = '''\
 Something wrong with reading login info.
@@ -191,6 +192,96 @@ def upload(html, keychain_pth):
     )
     site.login(keychain_pth)
     site.upload(page_name, html_pth)
+    site.logout()
+
+
+def parse_page_param(ctx, param, value):
+    if not value:
+        raise click.BadParameter('Empty page url')
+    *rest, page_name = value.rstrip('/').split('/')
+    if rest:
+        lang = rest[-1]
+    else:
+        lang = None
+    prev_lang = ctx.params.get('lang')
+    if not lang and not prev_lang:
+        raise click.BadParameter('lang code not set.')
+    if lang and lang not in LANG_CHOICES:
+        raise click.BadParameter('page url contains invalid lang code.')
+    if lang and prev_lang and lang != prev_lang:
+        raise click.BadParameter('lang code mismatch')
+
+    final_lang = lang or prev_lang
+    ctx.params['lang'] = final_lang
+
+    return page_name
+
+
+@cli.command(short_help='Download web page as html')
+@click.argument('page', metavar='<page_url>', callback=parse_page_param)
+@click.argument('dst', metavar='<html_pth>', default='.', required=False)
+@click.option(
+    '--lang',
+    type=click.Choice(LANG_CHOICES),
+    help='Lang code for page',
+    is_eager=True
+)
+@click.option(
+    '--force',
+    help='Overwrite existed file',
+    is_flag=True,
+    default=False
+)
+@click.option(
+    '--keychain', 'keychain_pth',
+    help='Path to .web_keychain for login',
+    default='.web_keychain',
+    show_default=True,
+    type=_existed_file_type(),
+)
+def download(lang, page, dst, force, keychain_pth):
+    """Download web page from <page_url> as html.
+
+    To grab a page,
+
+    \b
+        pyapac-web download https://tw.pycon.org/apac2015/en/venue
+        pyapac-web download en/venue
+        pyapac-web download --lang=en venue
+
+    If <html_pth> is an existed folder, it stores the html page at
+    <html_pth>/<lang>_<page>.html.
+
+    Otherwise, it will write the html to <html_pth> and
+    abort if that path exists unless --force is given.
+
+    By default it indents at 1 space. In vim use gg=G to re-indent.
+    You should really check the downloaded html before overwriting.
+    """
+    dst_pth = Path(dst)
+    if dst_pth.is_dir():
+        # create new file
+        out_pth = dst_pth / '{}_{}.html'.format(lang, page)
+    else:
+        # if not dir, write to this path
+        out_pth = dst_pth
+    if out_pth.exists() and not force:
+        raise FileExistsError(
+            '<html_pth> {!s} exists. Set --force to overwrite'
+            .format(out_pth)
+        )
+    click.echo(
+        'lang: {} | page: {} | out to {}'
+        .format(lang, page, str(out_pth))
+    )
+
+    # main logic
+    site = SiteConnector(
+        url_base='https://tw.pycon.org/2015apac',
+        lang=lang
+    )
+    site.login(keychain_pth)
+    site.download(page, out_pth)
     site.logout()
 
 
