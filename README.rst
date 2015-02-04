@@ -43,7 +43,8 @@ Upload web pages
 To update web page at ``tw.pycon.org/2015apac/<lang>/<page>``::
 
     pyapac-web upload /path/to/<lang>/<page>.html \
-        --keychain=/path/to/.web_keychain
+        --keychain=../.web_keychain
+    pyapac-web upload src.html --target <lang>/<page>
 
 **Commmit the html to** |content-repo|_ **before upload!**
 
