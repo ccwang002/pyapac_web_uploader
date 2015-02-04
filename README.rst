@@ -35,7 +35,8 @@ under ``.web_keychain`` with format::
     Account: 'your account'
     Password: 'your password'
 
-Your account must have the previlege to edit web pages. Normal speaker account will not work.
+Your account must have the previlege to edit web pages.
+Normal speaker account will not work.
 
 Upload web pages
 ----------------
@@ -48,6 +49,20 @@ To update web page at ``tw.pycon.org/2015apac/<lang>/<page>``::
 
 .. |content-repo| replace:: **this repo**
 .. _content-repo: https://github.com/pycontw/APAC2015WebContent
+
+Download from site
+------------------
+Sometimes people change directly on site,
+you may want to update that change into repo.
+This can be done by::
+
+    pyapac-web download <lang>/<page>
+
+By default, you could get a prettified HTML at ``./<lang>_<page>.html``.
+Note that uploaded HTML don't remember original indent space,
+you have to re-organize it yourself.
+
+Find more usage through its help page.
 
 
 Develop
