@@ -165,6 +165,28 @@ def cli():
     pass
 
 
+def parse_page_param(ctx, param, value):
+    if value is None:
+        return
+    *rest, page_name = value.rstrip('/').split('/')
+    if rest:
+        lang = rest[-1]
+    else:
+        lang = None
+    prev_lang = ctx.params.get('lang')
+    if not lang and not prev_lang:
+        raise click.BadParameter('lang code not set.')
+    if lang and lang not in LANG_CHOICES:
+        raise click.BadParameter('page url contains invalid lang code.')
+    if lang and prev_lang and lang != prev_lang:
+        raise click.BadParameter('lang code mismatch')
+
+    final_lang = lang or prev_lang
+    ctx.params['lang'] = final_lang
+
+    return page_name
+
+
 @cli.command(short_help='Upload html to web')
 @click.argument('html', type=_existed_file_type(), metavar='<html_pth>')
 @click.option(
@@ -199,28 +221,6 @@ def upload(html, keychain_pth):
     site.login(keychain_pth)
     site.upload(page_name, html_pth)
     site.logout()
-
-
-def parse_page_param(ctx, param, value):
-    if not value:
-        raise click.BadParameter('Empty page url')
-    *rest, page_name = value.rstrip('/').split('/')
-    if rest:
-        lang = rest[-1]
-    else:
-        lang = None
-    prev_lang = ctx.params.get('lang')
-    if not lang and not prev_lang:
-        raise click.BadParameter('lang code not set.')
-    if lang and lang not in LANG_CHOICES:
-        raise click.BadParameter('page url contains invalid lang code.')
-    if lang and prev_lang and lang != prev_lang:
-        raise click.BadParameter('lang code mismatch')
-
-    final_lang = lang or prev_lang
-    ctx.params['lang'] = final_lang
-
-    return page_name
 
 
 @cli.command(short_help='Download web page as html')
