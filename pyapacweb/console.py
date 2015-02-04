@@ -162,8 +162,9 @@ def cli():
 @click.argument('html', type=_existed_file_type(), metavar='<html_pth>')
 @click.option(
     '--keychain', 'keychain_pth',
-    help='Path to .web_keychain for login [default: .web_keychain]',
+    help='Path to .web_keychain for login',
     default='.web_keychain',
+    show_default=True,
     type=_existed_file_type(),
 )
 def upload(html, keychain_pth):
