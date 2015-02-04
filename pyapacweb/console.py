@@ -161,6 +161,13 @@ def cli():
 
     \b
         pyapac-web <subcmd> -h
+
+    Most commands require .web_keychain for login.
+    The format is:
+
+    \b
+        Account: 'YOUR ACCOUNT'
+        Password: 'PASSWORD'
     """
     pass
 
