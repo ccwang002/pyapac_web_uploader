@@ -25,7 +25,7 @@ class ConnectionError(Exception):
         self.resp = resp
         super().__init__(*args, **kwargs)
 
-    def __repr__(self):
+    def format_message(self):
         return (
             'ConnectionError: {0.msg} with {0.resp.status_code}'
             .format(self)
