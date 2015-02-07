@@ -20,10 +20,10 @@ Edit file {:s} with following format:
 '''
 
 class ConnectionError(Exception):
-    def __init__(self, msg, resp, *args, **kwargs):
+    def __init__(self, msg, resp):
+        super().__init__(msg, resp)
         self.msg = msg
         self.resp = resp
-        super().__init__(*args, **kwargs)
 
     def format_message(self):
         return (
