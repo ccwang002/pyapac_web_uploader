@@ -242,7 +242,9 @@ def upload(html, keychain_pth, lang=None, page=None):
                 param_hint='<html_pth>',
             )
         lang_suffix = html_pth.parts[lang_ix]
-        page_name = '/'.join(html_pth.parts[lang_ix + 1:])
+        page_name = '/'.join(
+            html_pth.parts[lang_ix + 1:-1] + (html_pth.stem, )
+        )
     click.echo(
         'Lang: {:s} | Page: {:s}'
         .format(lang_suffix, page_name)
