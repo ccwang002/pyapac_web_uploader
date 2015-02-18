@@ -302,7 +302,7 @@ def download(lang, page, dst, force, keychain_pth):
     dst_pth = Path(dst)
     if dst_pth.is_dir():
         # create new file
-        out_pth = dst_pth / '{}_{}.html'.format(lang, page)
+        out_pth = dst_pth / '{}_{}.html'.format(lang, page.replace('/', '-'))
     else:
         # if not dir, write to this path
         out_pth = dst_pth
