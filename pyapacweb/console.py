@@ -231,14 +231,18 @@ def upload(html, keychain_pth, lang=None, page=None):
         lang_suffix = lang
         page_name = page
     else:
-        *_, lang_suffix, __ = html_pth.parts
-        if not lang_suffix or lang_suffix not in LANG_CHOICES:
+        try:
+            lang_ix = next(
+                i for i, token in enumerate(html_pth.parts)
+                if token in LANG_CHOICES
+            )
+        except StopIteration:
             raise click.BadParameter(
-                'Unknown lang suffix: {:s} of path {!s}'
-                .format(lang_suffix, html_pth),
+                'Unknown lang suffix of path {!s}'.format(html_pth),
                 param_hint='<html_pth>',
             )
-        page_name = html_pth.stem
+        lang_suffix = html_pth.parts[lang_ix]
+        page_name = '/'.join(html_pth.parts[lang_ix + 1:])
     click.echo(
         'Lang: {:s} | Page: {:s}'
         .format(lang_suffix, page_name)
