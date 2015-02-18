@@ -226,11 +226,11 @@ def upload(html, keychain_pth, lang=None, page=None):
     Note that on web /<lang>/<page> must exist.
     """
     click.echo('Uploading {:s} ...'.format(html))
+    html_pth = Path(html).resolve()
     if lang and page:
         lang_suffix = lang
         page_name = page
     else:
-        html_pth = Path(html).resolve()
         *_, lang_suffix, __ = html_pth.parts
         if not lang_suffix or lang_suffix not in LANG_CHOICES:
             raise click.BadParameter(
