@@ -2,7 +2,7 @@ import functools
 from pathlib import Path
 import re
 import sys
-# import urllib
+from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 import click
@@ -175,11 +175,16 @@ def cli():
 def parse_page_param(ctx, param, value):
     if value is None:
         return
-    *rest, page_name = value.rstrip('/').split('/')
-    if rest:
-        lang = rest[-1]
+    url_tokens = urlparse(value).path.strip('/').split('/')
+    if url_tokens[0] == '2015apac':
+        url_tokens = url_tokens[1:]
+    if url_tokens[0] in LANG_CHOICES:
+        lang = url_tokens[0]
+        page_name = '/'.join(url_tokens[1:])
     else:
         lang = None
+        page_name = '/'.join(url_tokens)
+
     prev_lang = ctx.params.get('lang')
     if not lang and not prev_lang:
         raise click.BadParameter('lang code not set.')
