@@ -46,7 +46,7 @@ setup(
     ),
     py_modules=['pyapacweb'],
 
-    test_suit='nose.collector',
+    test_suite='nose.collector',
     entry_points={
         'console_scripts': [
             'pyapac-web = pyapacweb:cli',
