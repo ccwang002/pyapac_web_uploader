@@ -1,4 +1,12 @@
+"""\
+Web uploader for PyCon APAC 2015.
+
+See `pyapac-web -h` or README.md for its usage.
+"""
+__version__ = '0.0.1'
+
 import functools
+import logging
 from pathlib import Path
 import re
 import sys
@@ -7,7 +15,6 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import click
 import requests
-
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 LANG_CHOICES = ['en', 'zh', 'ja', 'kr']
 
@@ -18,6 +25,10 @@ Edit file {:s} with following format:
     Account: 'YOUR ACCOUNT'
     Password: 'PASSWORD'
 '''
+
+# create logger instance
+logger = logging.getLogger('pyapac-web')
+logger.addHandler(logging.NullHandler())
 
 class ConnectionError(Exception):
     def __init__(self, msg, resp):

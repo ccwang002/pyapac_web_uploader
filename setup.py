@@ -17,7 +17,7 @@ def find_version(*path_parts):
 
 setup(
     name='pyapac-webtool',
-    version=find_version('pyapacweb', '__init__.py'),
+    version=find_version('pyapacweb.py'),
 
     license='MIT',
     description='Web content tools for PyCon APAC 2015',
@@ -44,11 +44,12 @@ setup(
             '*.tests', '*.tests.*', 'tests.*', 'tests',
         ]
     ),
+    py_modules=['pyapacweb'],
 
     test_suit='nose.collector',
     entry_points={
         'console_scripts': [
-            'pyapac-web = pyapacweb.console:cli',
+            'pyapac-web = pyapacweb:cli',
         ]
     },
 )
