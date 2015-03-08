@@ -1,5 +1,0 @@
-six
-requests
-BeautifulSoup4
-click
-pathlib

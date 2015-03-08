@@ -1,10 +1,10 @@
-from pathlib import Path
+from io import open
 import re
 from setuptools import setup, find_packages
 
 
-def find_version(*path_parts):
-    with Path(*path_parts).open(encoding='utf8') as f:
+def find_version(pth):
+    with open(pth, encoding='utf8') as f:
         version_match = re.search(
             r"^__version__ = ['\"]([^'\"]*)['\"]",
             f.read(), re.M
@@ -36,7 +36,11 @@ setup(
     ],
     keywords=['pycon', 'apac', '2015', 'taiwan'],
 
-    install_requires=['requests > 2.5', 'beautifulsoup4 > 4.3', 'click'],
+    install_requires=['requests>2.5', 'beautifulsoup4>4.3', 'click', 'six'],
+    extras_require={
+        ':python_version=="2.7"': ['pathlib'],
+        ':python_version=="3.3"': ['pathlib'],
+    },
 
     packages=find_packages(
         exclude=[

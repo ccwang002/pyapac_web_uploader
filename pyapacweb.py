@@ -10,21 +10,17 @@ import logging
 from pathlib import Path
 import re
 import sys
-try:
-    from urllib.parse import urlparse
-except:
-    from urlparse import urlparse
-
-try:
-    FileExistsError
-except:
-    FileExistsError = IOError
-
 from bs4 import BeautifulSoup
 import click
 import requests
-
 import six
+
+if six.PY3:
+    from urllib.parse import urlparse
+else:
+    from urlparse import urlparse
+    FileExistsError = IOError
+
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 LANG_CHOICES = ['en', 'zh', 'ja', 'kr']
 
