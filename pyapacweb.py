@@ -36,6 +36,16 @@ Edit file {:s} with following format:
 logger = logging.getLogger('pyapac-web')
 logger.addHandler(logging.NullHandler())
 
+# create a click arugment type that only allows input of existed file
+_existed_file_type = functools.partial(
+    click.Path,
+    exists=True,
+    file_okay=True,
+    dir_okay=False,
+    readable=True
+)
+
+
 class ConnectionError(Exception):
     def __init__(self, msg, resp):
         super().__init__(msg, resp)
@@ -159,15 +169,6 @@ class SiteConnector:
             PASSWORD = re.match(_pwd_regex, next(f)).group('field')
 
         return ACCOUNT, PASSWORD
-
-
-_existed_file_type = functools.partial(
-    click.Path,
-    exists=True,
-    file_okay=True,
-    dir_okay=False,
-    readable=True
-)
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
