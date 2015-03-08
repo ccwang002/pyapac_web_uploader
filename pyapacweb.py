@@ -10,11 +10,21 @@ import logging
 from pathlib import Path
 import re
 import sys
-from urllib.parse import urlparse
+try:
+    from urllib.parse import urlparse
+except:
+    from urlparse import urlparse
+
+try:
+    FileExistsError
+except:
+    FileExistsError = IOError
 
 from bs4 import BeautifulSoup
 import click
 import requests
+
+import six
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 LANG_CHOICES = ['en', 'zh', 'ja', 'kr']
 
@@ -55,7 +65,7 @@ class SiteConnector:
         try:
             ACCOUNT, PASSWORD = self._read_keychain(keychain_pth)
         except Exception:
-            print(_LOGIN_ERR_MSG.format(keychain_pth))
+            six.print_(_LOGIN_ERR_MSG.format(keychain_pth))
             sys.exit(1)
         # standard Django login with CSRF protection
         r = self._session.get(self.login_url)
@@ -116,7 +126,7 @@ class SiteConnector:
         page_content_soup = BeautifulSoup(page_raw_html, 'html.parser')
         page_normalized_html = page_content_soup.prettify()
         with Path(dst_pth).open('w') as f:
-            print(page_normalized_html, file=f)
+            six.print_(page_normalized_html, file=f)
         return r
 
     def url(self, url):
