@@ -12,13 +12,14 @@ Clone this repo and run::
 
     python setup.py install
 
-It requires Python 3.4+ and the following packages:
+It requires Python 2.7 or 3.3+ and the following packages:
 
+- six
 - requests
 - BeautifulSoup4
 - click
 
-Python 3.3 may work with pathlib installed but not tested.
+On Python 2.7 and 3.3 requires pathlib.
 
 
 Usage
