@@ -21,6 +21,8 @@ It requires Python 2.7 or 3.3+ and the following packages:
 
 On Python 2.7 and 3.3 requires pathlib.
 
+pandas and lxml are required to get proposal statistics.
+
 
 Usage
 =====
@@ -67,6 +69,13 @@ Note that uploaded HTML don't remember original indent space,
 you have to re-organize it yourself.
 
 Find more usage through its help page.
+
+Proposal statistics
+-------------------
+Require pandas and lxml.
+Proposals grouped by talk type and language can be shown by::
+
+    pyapac-web stat
 
 
 Develop

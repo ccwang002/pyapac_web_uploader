@@ -27,10 +27,12 @@ setup(
 
     url='https://github.com/ccwang002/pyapac_web_uploader',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Stable',
         'Environment :: Console',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
     ],
@@ -40,6 +42,7 @@ setup(
     extras_require={
         ':python_version=="2.7"': ['pathlib'],
         ':python_version=="3.3"': ['pathlib'],
+        'stat': ['pandas', 'lxml'],
     },
 
     packages=find_packages(
