@@ -345,6 +345,44 @@ def download(lang, page, dst, force, keychain_pth):
     site.download(page, out_pth)
     site.logout()
 
+@cli.command(short_help='Get proposal statistics')
+@click.option(
+    '--keychain', 'keychain_pth',
+    help='Path to .web_keychain for login',
+    default='.web_keychain',
+    show_default=True,
+    type=_existed_file_type(),
+)
+def stat(keychain_pth):
+    """Get proposal statistics, grouped by talk type and language.
+
+    \b
+        pyapac-web stat --keychain='../.web_keychain'
+
+    """
+    try:
+        import pandas as pd  # noqa
+    except ImportError:
+        sys.exit('Require pandas and lxml.')
+    # main logic
+    site = SiteConnector(
+        url_base='https://tw.pycon.org/2015apac',
+        lang='en'
+    )
+    site.login(keychain_pth)
+    proposal_url = (
+        r'https://tw.pycon.org/2015apac/admin/proposal/proposalmodel/'
+    )
+    r = site._session.get(proposal_url)
+    soup = BeautifulSoup(r.content)
+    table = soup.find('table')
+    df_talks = pd.io.html.read_html(str(table))[0]
+    grouper = df_talks.groupby(['Type of the proposal', 'Language']).size()
+    click.echo(grouper)
+    click.echo('-' * 32)
+    click.echo('Total: {:d} proposals'.format(len(df_talks)))
+    site.logout()
+
 
 if __name__ == '__main__':
     cli()
