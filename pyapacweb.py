@@ -3,7 +3,7 @@ Web uploader for PyCon APAC 2015.
 
 See `pyapac-web -h` or README.md for its usage.
 """
-__version__ = '0.2'
+__version__ = '0.3'
 
 import functools
 import logging
