@@ -7,14 +7,17 @@ __version__ = '0.3'
 
 import functools
 import logging
+import operator
 from pathlib import Path
 import re
 import sys
+import textwrap
+
 from bs4 import BeautifulSoup
 import click
 import requests
 import six
-
+import pandas as pd
 if six.PY3:
     from urllib.parse import urlparse
 else:
@@ -169,6 +172,43 @@ class SiteConnector:
             PASSWORD = re.match(_pwd_regex, next(f)).group('field')
 
         return ACCOUNT, PASSWORD
+
+
+def make_review_table(table):
+    def review_status(text):
+        if text == 'Update':
+            return True
+        elif text == 'Review':
+            return False
+        else:
+            return pd.np.nan
+
+    def convert_col(col, dtype):
+        tmp = col.copy()
+        tmp[tmp == '－－－'] = pd.np.nan
+        return tmp.astype(dtype)
+
+    df = pd.io.html.read_html(str(table))[0]
+    required_cols = [
+        'ID', 'Author', 'Lang', 'Title', 'Speech Type',
+        'Reviews', 'Sum. Rank', 'Avg. Rank'
+    ]
+    df_out = df.loc[:, required_cols]
+    df_out['Review Status'] = df['Action'].apply(review_status)
+    for col, col_type in zip(
+        ['Reviews', 'Sum. Rank', 'Avg. Rank'],
+        [int] * 2 + [float] * 1
+    ):
+        df_out[col] = convert_col(df_out.loc[:, col], float)
+
+    return df_out
+
+
+def get_review_url(talk_id):
+    return (
+        r'https://tw.pycon.org/2015apac/en/'
+        r'proposal_review/review/{}/'.format(talk_id)
+    )
 
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -347,41 +387,110 @@ def download(lang, page, dst, force, keychain_pth):
 
 @cli.command(short_help='Get proposal statistics')
 @click.option(
+    '--review',
+    help='Get proposal review status',
+    is_flag=True,
+    default=False
+)
+@click.option(
+    '--csv', 'out_csv', metavar='PATH',
+    help='Store result as csv',
+)
+@click.option(
     '--keychain', 'keychain_pth',
     help='Path to .web_keychain for login',
     default='.web_keychain',
     show_default=True,
     type=_existed_file_type(),
 )
-def stat(keychain_pth):
+def stat(keychain_pth, review, out_csv):
     """Get proposal statistics, grouped by talk type and language.
 
     \b
         pyapac-web stat --keychain='../.web_keychain'
 
+    If --review is passed, get review statistics.
     """
-    try:
-        import pandas as pd  # noqa
-    except ImportError:
-        sys.exit('Require pandas and lxml.')
     # main logic
     site = SiteConnector(
         url_base='https://tw.pycon.org/2015apac',
         lang='en'
     )
     site.login(keychain_pth)
-    proposal_url = (
-        r'https://tw.pycon.org/2015apac/admin/proposal/proposalmodel/'
-    )
-    r = site._session.get(proposal_url)
-    soup = BeautifulSoup(r.content)
-    table = soup.find('table')
-    df_talks = pd.io.html.read_html(str(table))[0]
-    grouper = df_talks.groupby(['Type of the proposal', 'Language']).size()
-    click.echo(grouper)
-    click.echo('-' * 32)
-    click.echo('Total: {:d} proposals'.format(len(df_talks)))
+    if review:
+        proposal_review_url = (
+            r'https://tw.pycon.org/2015apac/en/'
+            r'proposal_review/proposals'
+        )
+        r = site._session.get(proposal_review_url)
+        soup = BeautifulSoup(r.content)
+        table = soup.find('table')
+        df_talks = make_review_table(table)
+        pd.set_option('display.max_rows', len(df_talks) * 2)
+        pd.set_option('display.max_colwidth', 256)
+        if out_csv:
+            df_talks.to_csv(out_csv)
+        else:
+            click.echo(df_talks)
+    else:
+        proposal_url = (
+            r'https://tw.pycon.org/2015apac/admin/proposal/proposalmodel/'
+        )
+        r = site._session.get(proposal_url)
+        soup = BeautifulSoup(r.content)
+        table = soup.find('table')
+        df_talks = pd.io.html.read_html(str(table))[0]
+        grouper = df_talks.groupby(['Type of the proposal', 'Language']).size()
+        click.echo(grouper)
+        click.echo('-' * 32)
+        click.echo('Total: {:d} proposals'.format(len(df_talks)))
     site.logout()
+
+
+@cli.command(short_help='Get proposal review status')
+@click.argument('id', metavar='<review_id>')
+@click.option(
+    '--keychain', 'keychain_pth',
+    help='Path to .web_keychain for login',
+    default='.web_keychain',
+    show_default=True,
+    type=_existed_file_type(),
+)
+def review(keychain_pth, id):
+    """Get the proposal info by its proposal id
+    """
+    # main logic
+    site = SiteConnector(
+        url_base='https://tw.pycon.org/2015apac',
+        lang='en'
+    )
+    site.login(keychain_pth)
+    r = site._session.get(get_review_url(id))
+    soup = BeautifulSoup(r.content)
+    title, _, author = soup.select('h3.d-title')[0].text.strip().split('\n')
+    for header, content in zip(
+        ['Title', 'Author'],
+        [title, author]
+    ):
+        click.echo(header.strip())
+        click.echo('=' * len(header))
+        click.echo(content.strip())
+        click.echo()
+
+    # for rewrapping proposal info under 70 chars
+    _, *proposal_content = map(
+        operator.attrgetter('text'),
+        soup.select('dl.dl-info dd > pre')
+    )
+    wrapper = textwrap.TextWrapper(width=70, replace_whitespace=False)
+    for header, content in zip(
+        ['Tags', 'Abstract', 'Description', 'Reference'],
+        proposal_content
+    ):
+        click.echo('\n' * 1)
+        click.echo(header)
+        click.echo('-' * len(header))
+        click.echo(wrapper.fill(content))
 
 
 if __name__ == '__main__':
