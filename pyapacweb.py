@@ -467,7 +467,13 @@ def review(keychain_pth, id):
     site.login(keychain_pth)
     r = site._session.get(get_review_url(id))
     soup = BeautifulSoup(r.content)
-    title, _, author = soup.select('h3.d-title')[0].text.strip().split('\n')
+    talk_info = soup.select('h3.d-title')[0].text.strip().split('\n')
+    title = talk_info[0]
+    try:
+        author = talk_info[2]
+    except IndexError:
+        author = 'UNKNOWN'
+
     for header, content in zip(
         ['Title', 'Author'],
         [title, author]
