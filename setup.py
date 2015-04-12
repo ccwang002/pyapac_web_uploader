@@ -38,11 +38,13 @@ setup(
     ],
     keywords=['pycon', 'apac', '2015', 'taiwan'],
 
-    install_requires=['requests>2.5', 'beautifulsoup4>4.3', 'click', 'six'],
+    install_requires=[
+        'requests>2.5', 'beautifulsoup4>4.3', 'click', 'six',
+        'pandas', 'lxml',  # for review and stat
+    ],
     extras_require={
         ':python_version=="2.7"': ['pathlib'],
         ':python_version=="3.3"': ['pathlib'],
-        'stat': ['pandas', 'lxml'],
     },
 
     packages=find_packages(
