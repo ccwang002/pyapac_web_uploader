@@ -185,13 +185,17 @@ def make_review_table(table):
 
     def convert_col(col, dtype):
         tmp = col.copy()
-        tmp[tmp == '－－－'] = pd.np.nan
+        try:
+            tmp[tmp == '－－－'] = pd.np.nan
+        except TypeError:
+            # no '－－－' to be handled
+            pass
         return tmp.astype(dtype)
 
     df = pd.io.html.read_html(str(table))[0]
     required_cols = [
         'ID', 'Author', 'Lang', 'Title', 'Speech Type',
-        'Reviews', 'Sum. Rank', 'Avg. Rank'
+        'Reviews', 'Sum. Rank', 'Avg. Rank', 'Decision',
     ]
     df_out = df.loc[:, required_cols]
     df_out['Review Status'] = df['Action'].apply(review_status)
